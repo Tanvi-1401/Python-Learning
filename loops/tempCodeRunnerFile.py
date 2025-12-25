@@ -1,5 +1,2 @@
-idx = 0
-while idx < len(nums) :
-    print(nums[idx])
-    idx += 1
-    
+for i in range(5): # range(stop)
+#     print(i)
