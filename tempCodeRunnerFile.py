@@ -1,0 +1,1 @@
+collection.remove(1)
