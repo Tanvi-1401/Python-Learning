@@ -1,0 +1,1 @@
+print("Multiplication:\n", a @ b)
