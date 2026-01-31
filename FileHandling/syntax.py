@@ -1,0 +1,8 @@
+f = open("FileHandling/sample.txt", "a")
+# data = f.read()
+# data = f.read(7)
+# data = f.readline()
+# data = f.readlines()
+# print(data)
+# f.write("This is new line.")
+f.close()
