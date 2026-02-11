@@ -1,63 +1,124 @@
-import numpy as np
+# Modular inverse
+def mod_inverse(a, m=26):
+    a = a % m
+    for x in range(1, m):
+        if (a * x) % m == 1:
+            return x
+    return -1
 
-# ---------- BASIC FUNCTIONS ----------
-def text_to_num(text):
-    return [ord(c) - 65 for c in text]
 
-def num_to_text(nums):
-    return ''.join(chr(int(n) + 65) for n in nums)
+# Determinant 2x2
+def det2(k):
+    return (k[0][0]*k[1][1] - k[0][1]*k[1][0]) % 26
 
-def mod_inverse(a, m):
-    for i in range(1, m):
-        if (a * i) % m == 1:
-            return i
-    return None
 
-# ---------- INPUT ----------
-plain = input("Enter Plain Text: ").upper().replace(" ", "")
-key_word = input("Enter Key Word: ").upper().replace(" ", "")
+# Determinant 3x3
+def det3(k):
+    d = (k[0][0]*(k[1][1]*k[2][2] - k[1][2]*k[2][1])
+        - k[0][1]*(k[1][0]*k[2][2] - k[1][2]*k[2][0])
+        + k[0][2]*(k[1][0]*k[2][1] - k[1][1]*k[2][0]))
+    return d % 26
 
-# Padding plaintext
-while len(plain) % 3 != 0:
-    plain += "X"
 
-# Padding key
-while len(key_word) < 9:
-    key_word += "X"
-key_word = key_word[:9]
+# Adjoint (2x2 and 3x3)
+def adjoint(k, n):
+    if n == 2:
+        adj = [[k[1][1], -k[0][1]],
+               [-k[1][0], k[0][0]]]
 
-# ---------- KEY MATRIX ----------
-key_nums = text_to_num(key_word)
-K = np.array(key_nums).reshape(3, 3)
+    elif n == 3:
+        adj = [[0]*3 for _ in range(3)]
 
-print("\nKey Matrix:")
-print(K)
+        adj[0][0] = k[1][1]*k[2][2] - k[1][2]*k[2][1]
+        adj[0][1] = k[0][2]*k[2][1] - k[0][1]*k[2][2]
+        adj[0][2] = k[0][1]*k[1][2] - k[0][2]*k[1][1]
 
-# ---------- ENCRYPTION ----------
-cipher = ""
+        adj[1][0] = k[1][2]*k[2][0] - k[1][0]*k[2][2]
+        adj[1][1] = k[0][0]*k[2][2] - k[0][2]*k[2][0]
+        adj[1][2] = k[0][2]*k[1][0] - k[0][0]*k[1][2]
 
-for i in range(0, len(plain), 3):
-    P = np.array(text_to_num(plain[i:i+3])).reshape(3, 1)
-    C = np.dot(K, P) % 26
-    cipher += num_to_text(C.flatten())
+        adj[2][0] = k[1][0]*k[2][1] - k[1][1]*k[2][0]
+        adj[2][1] = k[0][1]*k[2][0] - k[0][0]*k[2][1]
+        adj[2][2] = k[0][0]*k[1][1] - k[0][1]*k[1][0]
 
-print("\nCipher Text:", cipher)
+    # mod 26 correction
+    for i in range(n):
+        for j in range(n):
+            adj[i][j] = adj[i][j] % 26
 
-# ---------- DECRYPTION ----------
-det = int(round(np.linalg.det(K))) % 26
-det_inv = mod_inverse(det, 26)
+    return adj
 
-adj = np.round(det * np.linalg.inv(K)).astype(int) % 26
-K_inv = (det_inv * adj) % 26
 
-print("\nInverse Key Matrix:")
-print(K_inv)
+# Inverse matrix
+def inverse_matrix(k, n):
+    if n == 2:
+        det = det2(k)
+    else:
+        det = det3(k)
 
-decrypted = ""
+    inv_det = mod_inverse(det)
 
-for i in range(0, len(cipher), 3):
-    C = np.array(text_to_num(cipher[i:i+3])).reshape(3, 1)
-    P = np.dot(K_inv, C) % 26
-    decrypted += num_to_text(P.flatten())
+    if inv_det == -1:
+        print("❌ Not invertible (Determinant has no modular inverse)")
+        return None
 
-print("\nDecrypted Text:", decrypted)
+    adj = adjoint(k, n)
+
+    inv = [[(adj[i][j] * inv_det) % 26 for j in range(n)] for i in range(n)]
+    return inv
+
+
+# Encryption / Decryption process
+def process(text, n, k):
+    text = text.upper().replace(" ", "")
+
+    while len(text) % n != 0:
+        text += 'X'
+
+    result = ""
+
+    for i in range(0, len(text), n):
+        vector = [ord(text[i+j]) - 65 for j in range(n)]
+        res = [0]*n
+
+        for row in range(n):
+            for col in range(n):
+                res[row] += k[row][col] * vector[col]
+            res[row] %= 26
+
+        for j in range(n):
+            result += chr(res[j] + 65)
+
+    return result
+
+
+# ---------------- MAIN ----------------
+
+keyStr = input("Enter key string (4 letters for 2x2, 9 letters for 3x3): ").upper()
+text = input("Enter plaintext: ").upper()
+
+if len(keyStr) == 4:
+    n = 2
+    k = [[ord(keyStr[i*2+j]) - 65 for j in range(2)] for i in range(2)]
+
+elif len(keyStr) == 9:
+    n = 3
+    k = [[ord(keyStr[i*3+j]) - 65 for j in range(3)] for i in range(3)]
+
+else:
+    print("Invalid key length! Use 4 or 9 letters.")
+    exit()
+
+print("Key Matrix:", k)
+
+# Encryption
+encrypted = process(text, n, k)
+print("Encrypted:", encrypted)
+
+# Decryption
+inverse = inverse_matrix(k, n)
+
+if inverse:
+    print("Inverse Matrix:", inverse)
+    decrypted = process(encrypted, n, inverse)
+    print("Decrypted:", decrypted[:len(text)])
