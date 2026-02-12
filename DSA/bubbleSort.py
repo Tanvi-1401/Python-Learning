@@ -15,4 +15,4 @@ def bubble(arr1):
 arr1 = [24, 41, 50, 40]
 bubble(arr1)
 
-print("Sorted array is:", arr1)
+print("Sorted array is: ", arr1)
