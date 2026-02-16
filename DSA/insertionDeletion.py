@@ -24,4 +24,4 @@ if del_val in arr:
     arr.remove(del_val)
     print("Array after deletion:", arr)
 else:
-    print("Element not found in array")
+    print("Elemnet not found in array.")
