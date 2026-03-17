@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RSA Algorithm</title>
+</head>
+
+<body>
+
+<h2>RSA Encryption and Decryption</h2>
+
+Enter prime number p:
+<input type="number" id="p"><br><br>
+
+Enter prime number q:
+<input type="number" id="q"><br><br>
+
+Enter message:
+<input type="number" id="msg"><br><br>
+
+<button onclick="rsa()">Run RSA</button>
+
+<p id="result"></p>
+
+<script>
+
+function isPrime(n){
+if(n<=1) return false;
+
+for(let i=2;i<n;i++){
+if(n%i==0) return false;
+}
+
+return true;
+}
+
+function gcd(a,b){
+while(b!=0){
+let temp=b;
+b=a%b;
+a=temp;
+}
+return a;
+}
+
+function modInverse(e,phi){
+for(let d=1;d<phi;d++){
+if((d*e)%phi==1){
+return d;
+}
+}
+}
+
+function power(base,exp,mod){
+let result=1;
+for(let i=0;i<exp;i++){
+result=(result*base)%mod;
+}
+return result;
+}
+
+function rsa(){
+
+let p=parseInt(document.getElementById("p").value);
+let q=parseInt(document.getElementById("q").value);
+let m=parseInt(document.getElementById("msg").value);
+
+if(!isPrime(p) || !isPrime(q)){
+document.getElementById("result").innerHTML="p and q must be prime numbers";
+return;
+}
+
+let n=p*q;
+
+let phi=(p-1)*(q-1);
+
+let e=3;
+
+while(gcd(e,phi)!=1){
+e++;
+}
+
+let d=modInverse(e,phi);
+
+let c=power(m,e,n);
+
+let decrypt=power(c,d,n);
+
+document.getElementById("result").innerHTML=
+"Public Key (e,n): ("+e+","+n+")<br>"+
+"Private Key (d,n): ("+d+","+n+")<br>"+
+"Encrypted Message: "+c+"<br>"+
+"Decrypted Message: "+decrypt;
+
+}
+
+</script>
+
+</body>
+</html>
