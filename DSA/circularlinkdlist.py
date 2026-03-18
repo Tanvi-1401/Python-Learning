@@ -66,6 +66,26 @@ class CircularList:
             temp=temp.next
 
         temp.next=self.head
+        
+    def delete_pos(self,pos):
+
+        if self.head is None:
+            print("List empty")
+            return
+
+        if pos == 1:
+            temp=self.head
+            while temp.next!=self.head:
+                temp=temp.next
+            self.head=self.head.next
+            temp.next=self.head
+            return
+
+        temp=self.head
+        for i in range(pos-2):
+            temp=temp.next
+
+        temp.next=temp.next.next    
 
     def display(self):
         if self.head is None:
@@ -89,8 +109,9 @@ while True:
     print("3.Insert Position")
     print("4.Delete Begin")
     print("5.Delete End")
-    print("6.Display")
-    print("7.Exit")
+    print("6.Delete Position")
+    print("7.Display")
+    print("8.Exit")
 
     ch=int(input("Enter choice: "))
 
@@ -114,7 +135,11 @@ while True:
         cl.delete_end()
 
     elif ch==6:
+        pos=int(input("Position: "))
+        cl.delete_pos(pos)
+    
+    elif ch==7:
         cl.display()
 
-    elif ch==7:
+    elif ch==8:
         break
