@@ -7,5 +7,5 @@ elif(light == "green"):
 elif(light == "yellow"):
     print("Wait")
     
-print("End of Code.")
+print("Print of code")
 
