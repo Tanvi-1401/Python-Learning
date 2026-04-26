@@ -1,8 +1,12 @@
-lst = [9, 8, 7, 86, 25, 67, 3, 2, 1]
+def return_only_integer(lst):
+    result = []
+    
+    for item in lst:
+        if item.isdigit():
+            result.append(item)
+    
+    return result
 
-for i in range(len(lst)-1):
-    for j in range(len(lst)-1-i):
-        if lst[j] > lst[j+1]:
-            lst[j], lst[j+1] = lst[j+1], lst[j]
 
-print(lst)
+# Example
+print(return_only_integer([9, 2, "bvrn", "gcet", "adit", 16]))

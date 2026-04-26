@@ -5,7 +5,7 @@ print(list)
 
 #print(list.sort()) -- output null
 list.sort()
-print(list)
+print(list) 
 list.sort(reverse = True)
 print(list)
 
